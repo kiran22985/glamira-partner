@@ -1,30 +1,35 @@
-// This is a basic Flutter widget test.
+// Basic smoke test for the partner app's entry screen.
 //
 // To perform an interaction with a widget in your test, use the WidgetTester
 // utility in the flutter_test package. For example, you can send tap and scroll
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:glamira_partner/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Login screen renders its form and actions',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const PartnerApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Please sign in to your account'), findsOneWidget);
+    expect(find.text('Email Address'), findsOneWidget);
+    expect(find.text('Password'), findsOneWidget);
+    expect(find.text('Login'), findsOneWidget);
+    expect(find.text('OR CONTINUE WITH'), findsOneWidget);
+    expect(find.text('Sign Up'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  testWidgets('Sign Up link opens the partner sign-up screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const PartnerApp());
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    await tester.tap(find.text('Sign Up'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Grow Your Business'), findsOneWidget);
+    expect(find.text('CREATE PARTNER ACCOUNT'), findsOneWidget);
   });
 }
