@@ -75,7 +75,7 @@ class PartnerTextField extends StatelessWidget {
                 color: AppColors.ink,
               ),
             ),
-            if (labelTrailing != null) labelTrailing!,
+            ?labelTrailing,
           ],
         ),
         SizedBox(height: 4.h),
