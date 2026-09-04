@@ -17,6 +17,8 @@ class PartnerPrimaryButton extends StatelessWidget {
     this.borderRadius = 8,
     this.verticalPadding = 12,
     this.textColor = AppColors.onBrand,
+    this.fontWeight = FontWeight.w600,
+    this.trailing,
     this.shadow = false,
     this.busy = false,
   });
@@ -26,6 +28,12 @@ class PartnerPrimaryButton extends StatelessWidget {
   final double borderRadius;
   final double verticalPadding;
   final Color textColor;
+
+  /// w600 on the auth screens, w700 on the onboarding CTAs.
+  final FontWeight fontWeight;
+
+  /// Optional icon drawn 8px after the label — the onboarding arrow.
+  final Widget? trailing;
 
   /// The sign-up submit carries a 1px drop shadow; the login button doesn't.
   final bool shadow;
@@ -64,16 +72,25 @@ class PartnerPrimaryButton extends StatelessWidget {
                   ),
                 ),
               )
-            : Text(
-                label,
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  fontSize: 12.sp,
-                  height: 16 / 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.6,
-                  color: textColor,
-                ),
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    label,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 12.sp,
+                      height: 16 / 12,
+                      fontWeight: fontWeight,
+                      letterSpacing: 0.6,
+                      color: textColor,
+                    ),
+                  ),
+                  if (trailing != null) ...[
+                    SizedBox(width: 8.w),
+                    trailing!,
+                  ],
+                ],
               ),
       ),
     );

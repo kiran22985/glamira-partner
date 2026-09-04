@@ -1,4 +1,4 @@
-// Basic smoke test for the partner app's entry screen.
+// Smoke tests for the partner app's onboarding → login flow.
 //
 // To perform an interaction with a widget in your test, use the WidgetTester
 // utility in the flutter_test package. For example, you can send tap and scroll
@@ -10,21 +10,53 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:glamira_partner/main.dart';
 
 void main() {
-  testWidgets('Login screen renders its form and actions',
+  testWidgets('Onboarding opens on the first slide',
       (WidgetTester tester) async {
     await tester.pumpWidget(const PartnerApp());
 
+    expect(find.text('Grow Your Beauty Business'), findsOneWidget);
+    expect(find.text('NEXT'), findsOneWidget);
+  });
+
+  testWidgets('NEXT walks through all three slides to GET STARTED',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const PartnerApp());
+
+    await tester.tap(find.text('NEXT'));
+    await tester.pumpAndSettle();
+    expect(find.text('Seamless Management'), findsOneWidget);
+
+    await tester.tap(find.text('NEXT'));
+    await tester.pumpAndSettle();
+    expect(find.text('Real-time Insights'), findsOneWidget);
+    expect(find.text('GET STARTED'), findsOneWidget);
+  });
+
+  testWidgets('GET STARTED opens the login screen',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const PartnerApp());
+
+    for (var i = 0; i < 2; i++) {
+      await tester.tap(find.text('NEXT'));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(find.text('GET STARTED'));
+    await tester.pumpAndSettle();
+
     expect(find.text('Please sign in to your account'), findsOneWidget);
-    expect(find.text('Email Address'), findsOneWidget);
-    expect(find.text('Password'), findsOneWidget);
     expect(find.text('Login'), findsOneWidget);
-    expect(find.text('OR CONTINUE WITH'), findsOneWidget);
-    expect(find.text('Sign Up'), findsOneWidget);
   });
 
   testWidgets('Sign Up link opens the partner sign-up screen',
       (WidgetTester tester) async {
     await tester.pumpWidget(const PartnerApp());
+
+    for (var i = 0; i < 2; i++) {
+      await tester.tap(find.text('NEXT'));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(find.text('GET STARTED'));
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('Sign Up'));
     await tester.pumpAndSettle();

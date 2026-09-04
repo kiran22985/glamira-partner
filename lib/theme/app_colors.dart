@@ -32,4 +32,7 @@ class AppColors {
 
   /// Warm accent used by the sign-up screen's ambient background blob.
   static const Color gold = Color(0xFFFED65B);
+
+  /// Inactive onboarding progress dot (the active one uses [link]).
+  static const Color dotInactive = Color(0xFFE4E2E2);
 }

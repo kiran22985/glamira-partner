@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/auth/partner_login_page.dart';
+import 'screens/onboarding/partner_onboarding_screen.dart';
 import 'theme/app_colors.dart';
 import 'widgets/responsive_frame.dart';
 
@@ -30,7 +30,7 @@ class PartnerApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const PartnerLoginPage(),
+      home: const PartnerOnboardingScreen(),
       // Constrains the mobile design to a centered phone-width frame on large
       // screens and drives flutter_screenutil's scaling. Applies to every route.
       builder: (context, child) => ResponsiveFrame(child: child!),
