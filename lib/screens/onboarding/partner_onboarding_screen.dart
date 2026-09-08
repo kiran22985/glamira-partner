@@ -40,6 +40,9 @@ class PartnerOnboardingScreen extends StatefulWidget {
 }
 
 class _PartnerOnboardingScreenState extends State<PartnerOnboardingScreen> {
+  /// Corner radius of the slide artwork.
+  static const double _artworkRadius = 20;
+
   final _controller = PageController();
   int _index = 0;
 
@@ -132,7 +135,9 @@ class _PartnerOnboardingScreenState extends State<PartnerOnboardingScreen> {
       padding: EdgeInsets.symmetric(horizontal: 32.w),
       child: Column(
         children: [
-          SizedBox(height: 28.h),
+          // 100px from the frame top in Figma, less the status bar that
+          // SafeArea already accounts for.
+          SizedBox(height: 53.h),
           _buildArtwork(page),
           SizedBox(height: 45.h),
           Text(
@@ -178,7 +183,7 @@ class _PartnerOnboardingScreenState extends State<PartnerOnboardingScreen> {
               padding: const EdgeInsets.all(1),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(8.r),
+                borderRadius: BorderRadius.circular(_artworkRadius.r),
                 border: Border.all(color: AppColors.dotInactive),
                 boxShadow: const [
                   BoxShadow(
@@ -189,11 +194,15 @@ class _PartnerOnboardingScreenState extends State<PartnerOnboardingScreen> {
                 ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(8.r),
+                // Inset by the 1px border so the corners stay concentric.
+                borderRadius: BorderRadius.circular(_artworkRadius.r - 1),
                 child: image,
               ),
             )
-          : image,
+          : ClipRRect(
+              borderRadius: BorderRadius.circular(_artworkRadius.r),
+              child: image,
+            ),
     );
   }
 

@@ -6,6 +6,7 @@ import '../../theme/app_colors.dart';
 import '../../utils/validators.dart';
 import '../../widgets/auth_widgets.dart';
 import '../../widgets/partner_text_field.dart';
+import '../services/add_service_page.dart';
 import 'partner_signup_page.dart';
 
 /// Partner Login screen — translated from the Figma "Partner Login" frame
@@ -33,8 +34,11 @@ class _PartnerLoginPageState extends State<PartnerLoginPage> {
   void _login() {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    // The partner API doesn't exist yet — see the backend's auth-only schema.
-    _notReady('Partner login');
+    // TODO: authenticate against the partner API once it exists. For now this
+    // goes straight to Add Service so the screen can be reviewed.
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const AddServicePage()),
+    );
   }
 
   void _notReady(String label) {

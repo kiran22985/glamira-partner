@@ -5,6 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:glamira_partner/main.dart';
@@ -45,6 +46,28 @@ void main() {
 
     expect(find.text('Please sign in to your account'), findsOneWidget);
     expect(find.text('Login'), findsOneWidget);
+  });
+
+  testWidgets('Logging in opens the Add Service page',
+      (WidgetTester tester) async {
+    await tester.pumpWidget(const PartnerApp());
+
+    for (var i = 0; i < 2; i++) {
+      await tester.tap(find.text('NEXT'));
+      await tester.pumpAndSettle();
+    }
+    await tester.tap(find.text('GET STARTED'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+        find.byType(TextFormField).first, 'partner@glamira.com');
+    await tester.enterText(find.byType(TextFormField).last, 'supersecret');
+    await tester.tap(find.text('Login'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Add Service'), findsOneWidget);
+    expect(find.text('Service Details'), findsOneWidget);
+    expect(find.text('Save Service'), findsOneWidget);
   });
 
   testWidgets('Sign Up link opens the partner sign-up screen',

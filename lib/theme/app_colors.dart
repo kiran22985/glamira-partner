@@ -33,6 +33,15 @@ class AppColors {
   /// Warm accent used by the sign-up screen's ambient background blob.
   static const Color gold = Color(0xFFFED65B);
 
+  /// Hairline around content cards, and the onboarding artwork frame.
+  static const Color cardBorder = Color(0xFFE4E2E2);
+
   /// Inactive onboarding progress dot (the active one uses [link]).
-  static const Color dotInactive = Color(0xFFE4E2E2);
+  static const Color dotInactive = cardBorder;
+
+  /// Placeholder / helper text inside inputs on the Add Service form.
+  static const Color hint = Color(0xFF817478);
+
+  /// Fill of a selected category chip.
+  static const Color chipSelected = Color(0xFFFFD8E5);
 }

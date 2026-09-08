@@ -23,6 +23,11 @@ class PartnerTextField extends StatelessWidget {
     this.textInputAction,
     this.borderRadius = 12,
     this.validator,
+    this.hintColor = AppColors.border,
+    this.contentPadding,
+    this.maxLines = 1,
+    this.minHeight = 44,
+    this.labelGap = 4,
   });
 
   /// Field label, rendered above the input in small caps-ish tracking.
@@ -48,6 +53,22 @@ class PartnerTextField extends StatelessWidget {
 
   final String? Function(String?)? validator;
 
+  /// Placeholder colour — [AppColors.border] on the auth screens, the darker
+  /// [AppColors.hint] on the Add Service form.
+  final Color hintColor;
+
+  /// Overrides the default padding; the Add Service inputs are roomier.
+  final EdgeInsetsGeometry? contentPadding;
+
+  /// >1 turns the field into a textarea (the service Description).
+  final int maxLines;
+
+  /// Minimum box height, before any error text.
+  final double minHeight;
+
+  /// Space between the label and the input — 4 on auth, 8 on Add Service.
+  final double labelGap;
+
   static const Color _errorColor = Color(0xFFB3261E);
 
   @override
@@ -65,35 +86,40 @@ class PartnerTextField extends StatelessWidget {
               ? MainAxisAlignment.spaceBetween
               : MainAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                fontSize: 12.sp,
-                height: 16 / 12,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.6,
-                color: AppColors.ink,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.inter(
+                  fontSize: 12.sp,
+                  height: 16 / 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.6,
+                  color: AppColors.ink,
+                ),
               ),
             ),
-            ?labelTrailing,
+            if (labelTrailing != null) Flexible(child: labelTrailing!),
           ],
         ),
-        SizedBox(height: 4.h),
+        SizedBox(height: labelGap.h),
         TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           textInputAction: textInputAction,
           validator: validator,
+          maxLines: obscureText ? 1 : maxLines,
           style: GoogleFonts.inter(fontSize: 14.sp, color: AppColors.ink),
           decoration: InputDecoration(
             isDense: true,
-            // Keep the designed 44px box height; errors render below it.
-            constraints: BoxConstraints(minHeight: 44.h),
+            // Keep the designed box height; errors render below it.
+            constraints: BoxConstraints(minHeight: minHeight.h),
             hintText: hint,
             hintStyle: GoogleFonts.inter(
               fontSize: 14.sp,
-              color: AppColors.border,
+              color: hintColor,
             ),
             filled: true,
             fillColor: Colors.white,
@@ -109,12 +135,13 @@ class PartnerTextField extends StatelessWidget {
             suffixIcon: suffixIcon,
             suffixIconConstraints:
                 const BoxConstraints(minWidth: 0, minHeight: 0),
-            contentPadding: EdgeInsets.only(
-              left: prefixIcon == null ? 13.w : 0,
-              right: 13.w,
-              top: 12.h,
-              bottom: 13.h,
-            ),
+            contentPadding: contentPadding ??
+                EdgeInsets.only(
+                  left: prefixIcon == null ? 13.w : 0,
+                  right: 13.w,
+                  top: 12.h,
+                  bottom: 13.h,
+                ),
             errorStyle: GoogleFonts.inter(fontSize: 12.sp, color: _errorColor),
             border: border(AppColors.border),
             enabledBorder: border(AppColors.border),

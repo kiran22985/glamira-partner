@@ -75,15 +75,17 @@ class PartnerPrimaryButton extends StatelessWidget {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    label,
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.inter(
-                      fontSize: 12.sp,
-                      height: 16 / 12,
-                      fontWeight: fontWeight,
-                      letterSpacing: 0.6,
-                      color: textColor,
+                  Flexible(
+                    child: Text(
+                      label,
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.inter(
+                        fontSize: 12.sp,
+                        height: 16 / 12,
+                        fontWeight: fontWeight,
+                        letterSpacing: 0.6,
+                        color: textColor,
+                      ),
                     ),
                   ),
                   if (trailing != null) ...[
@@ -136,14 +138,16 @@ class GoogleButton extends StatelessWidget {
                     height: 20.r,
                   ),
                   SizedBox(width: 12.w),
-                  Text(
-                    'Google',
-                    style: GoogleFonts.inter(
-                      fontSize: 12.sp,
-                      height: 16 / 12,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.6,
-                      color: AppColors.ink,
+                  Flexible(
+                    child: Text(
+                      'Google',
+                      style: GoogleFonts.inter(
+                        fontSize: 12.sp,
+                        height: 16 / 12,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.6,
+                        color: AppColors.ink,
+                      ),
                     ),
                   ),
                 ],
@@ -167,16 +171,20 @@ class OrSeparator extends StatelessWidget {
     return Row(
       children: [
         divider,
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16.w),
-          child: Text(
-            label,
-            style: GoogleFonts.inter(
-              fontSize: 12.sp,
-              height: 16 / 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-              color: AppColors.body,
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.w),
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.inter(
+                fontSize: 12.sp,
+                height: 16 / 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+                color: AppColors.body,
+              ),
             ),
           ),
         ),
@@ -204,25 +212,29 @@ class AuthFooterLink extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          prompt,
-          style: GoogleFonts.inter(
-            fontSize: 14.sp,
-            height: 20 / 14,
-            color: AppColors.body,
+        Flexible(
+          child: Text(
+            prompt,
+            style: GoogleFonts.inter(
+              fontSize: 14.sp,
+              height: 20 / 14,
+              color: AppColors.body,
+            ),
           ),
         ),
         SizedBox(width: 4.w),
-        GestureDetector(
-          onTap: onTap,
-          child: Text(
-            action,
-            style: GoogleFonts.inter(
-              fontSize: 12.sp,
-              height: 16 / 12,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.6,
-              color: AppColors.link,
+        Flexible(
+          child: GestureDetector(
+            onTap: onTap,
+            child: Text(
+              action,
+              style: GoogleFonts.inter(
+                fontSize: 12.sp,
+                height: 16 / 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.6,
+                color: AppColors.link,
+              ),
             ),
           ),
         ),
