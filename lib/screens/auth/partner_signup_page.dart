@@ -24,6 +24,7 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
   final _businessNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _phoneController = TextEditingController();
+  final _addressController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmController = TextEditingController();
 
@@ -37,6 +38,7 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
     _businessNameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _addressController.dispose();
     _passwordController.dispose();
     _confirmController.dispose();
     super.dispose();
@@ -54,8 +56,9 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
   }
 
   void _snack(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -146,7 +149,7 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
                 ),
                 SizedBox(height: 20.h),
                 PartnerTextField(
-                  label: 'BUSINESS NAME',
+                  label: 'BUSINESS NAME/PARLOR NAME',
                   controller: _businessNameController,
                   textInputAction: TextInputAction.next,
                   validator: (v) =>
@@ -170,6 +173,15 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
                 ),
                 SizedBox(height: 20.h),
                 PartnerTextField(
+                  label: 'ADDRESS',
+                  controller: _addressController,
+                  keyboardType: TextInputType.streetAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: (v) =>
+                      Validators.requiredField(v, field: 'Address'),
+                ),
+                SizedBox(height: 20.h),
+                PartnerTextField(
                   label: 'PASSWORD',
                   controller: _passwordController,
                   obscureText: _obscurePassword,
@@ -177,9 +189,8 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
                   validator: Validators.password,
                   suffixIcon: _visibilityToggle(
                     obscured: _obscurePassword,
-                    onTap: () => setState(
-                      () => _obscurePassword = !_obscurePassword,
-                    ),
+                    onTap: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
                 SizedBox(height: 20.h),
@@ -188,10 +199,8 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
                   controller: _confirmController,
                   obscureText: _obscureConfirm,
                   textInputAction: TextInputAction.done,
-                  validator: (v) => Validators.confirmPassword(
-                    v,
-                    _passwordController.text,
-                  ),
+                  validator: (v) =>
+                      Validators.confirmPassword(v, _passwordController.text),
                   suffixIcon: _visibilityToggle(
                     obscured: _obscureConfirm,
                     onTap: () =>
