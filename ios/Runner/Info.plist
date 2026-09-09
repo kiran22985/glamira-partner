@@ -47,6 +47,8 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Glamira Partner needs access to your photos so you can add a picture of your parlor.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

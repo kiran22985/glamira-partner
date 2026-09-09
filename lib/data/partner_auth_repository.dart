@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -101,6 +103,50 @@ class PartnerAuthRepository {
       rethrow;
     } catch (_) {
       throw PartnerAuthException('Google sign-in failed. Please try again.');
+    }
+  }
+
+  /// Uploads the parlor photo and returns the updated partner. Requires a
+  /// stored token, so call it after signup/login has succeeded.
+  Future<Partner> uploadParlorImage(File file) async {
+    final t = token;
+    if (t == null) throw PartnerAuthException('You are not signed in.');
+    try {
+      // Dio sends application/octet-stream unless the type is set explicitly,
+      // so declare it from the extension. (The server also sniffs the file's
+      // magic bytes, so this is correctness rather than the only defence.)
+      final name = file.path.split('/').last;
+      final isPng = name.toLowerCase().endsWith('.png');
+      final form = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          file.path,
+          filename: name,
+          contentType: DioMediaType('image', isPng ? 'png' : 'jpeg'),
+        ),
+      });
+      final res = await _dio.post(
+        '/partner/auth/me/parlor-image',
+        data: form,
+        options: Options(headers: {'Authorization': 'Bearer $t'}),
+      );
+      return Partner.fromJson((res.data as Map).cast<String, dynamic>());
+    } on DioException catch (e) {
+      throw PartnerAuthException(_messageFor(e));
+    }
+  }
+
+  /// Removes the current parlor photo and returns the updated partner.
+  Future<Partner> removeParlorImage() async {
+    final t = token;
+    if (t == null) throw PartnerAuthException('You are not signed in.');
+    try {
+      final res = await _dio.delete(
+        '/partner/auth/me/parlor-image',
+        options: Options(headers: {'Authorization': 'Bearer $t'}),
+      );
+      return Partner.fromJson((res.data as Map).cast<String, dynamic>());
+    } on DioException catch (e) {
+      throw PartnerAuthException(_messageFor(e));
     }
   }
 

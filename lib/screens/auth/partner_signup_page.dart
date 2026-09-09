@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -10,6 +11,7 @@ import '../../providers/auth_providers.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/validators.dart';
 import '../../widgets/auth_widgets.dart';
+import '../../widgets/image_picker_field.dart';
 import '../../widgets/partner_text_field.dart';
 import '../services/add_service_page.dart';
 
@@ -37,6 +39,9 @@ class _PartnerSignupPageState extends ConsumerState<PartnerSignupPage> {
   bool _agreedToTerms = false;
   bool _submitting = false;
 
+  /// Chosen parlor photo. Not yet uploaded — the API has no endpoint for it.
+  File? _parlorImage;
+
   @override
   void dispose() {
     _fullNameController.dispose();
@@ -59,15 +64,28 @@ class _PartnerSignupPageState extends ConsumerState<PartnerSignupPage> {
 
     setState(() => _submitting = true);
     try {
-      await ref.read(partnerAuthRepositoryProvider).signup(
-            fullName: _fullNameController.text,
-            businessName: _businessNameController.text,
-            email: _emailController.text,
-            phoneNumber: _phoneController.text,
-            address: _addressController.text,
-            password: _passwordController.text,
-          );
+      final repository = ref.read(partnerAuthRepositoryProvider);
+      await repository.signup(
+        fullName: _fullNameController.text,
+        businessName: _businessNameController.text,
+        email: _emailController.text,
+        phoneNumber: _phoneController.text,
+        address: _addressController.text,
+        password: _passwordController.text,
+      );
       ref.read(authStateProvider.notifier).refresh();
+
+      // The image needs the token signup just stored, so it's a second call.
+      // A failure here must not strand the partner on the form — the account
+      // already exists — so it only warns and carries on.
+      final image = _parlorImage;
+      if (image != null) {
+        try {
+          await repository.uploadParlorImage(image);
+        } on PartnerAuthException catch (e) {
+          _snack('Account created, but the parlor image failed: ${e.message}');
+        }
+      }
       if (!mounted) return;
       // Signing up logs the partner straight in, so clear the auth stack.
       Navigator.of(context).pushAndRemoveUntil(
@@ -205,6 +223,12 @@ class _PartnerSignupPageState extends ConsumerState<PartnerSignupPage> {
                   textInputAction: TextInputAction.next,
                   validator: (v) =>
                       Validators.requiredField(v, field: 'Address'),
+                ),
+                SizedBox(height: 20.h),
+                ImagePickerField(
+                  label: 'PARLOR IMAGE',
+                  value: _parlorImage,
+                  onChanged: (file) => setState(() => _parlorImage = file),
                 ),
                 SizedBox(height: 20.h),
                 PartnerTextField(

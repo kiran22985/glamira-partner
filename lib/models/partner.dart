@@ -8,6 +8,7 @@ class Partner {
     required this.phoneNumber,
     required this.address,
     required this.isActive,
+    this.imageUrl,
   });
 
   final String id;
@@ -18,6 +19,10 @@ class Partner {
   final String address;
   final bool isActive;
 
+  /// Server-relative path to the parlor photo (e.g. `/media/parlors/x.jpg`),
+  /// or null. Prefix with [apiBaseUrl] to load it.
+  final String? imageUrl;
+
   factory Partner.fromJson(Map<String, dynamic> json) {
     return Partner(
       id: json['id'] as String,
@@ -27,6 +32,7 @@ class Partner {
       phoneNumber: json['phone_number'] as String,
       address: json['address'] as String,
       isActive: json['is_active'] as bool? ?? true,
+      imageUrl: json['image_url'] as String?,
     );
   }
 }
