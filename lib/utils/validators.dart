@@ -27,6 +27,14 @@ class Validators {
     return null;
   }
 
+  /// The 6-digit one-time code emailed by `/partner/auth/forgot-password`.
+  static String? code(String? value) {
+    final v = value?.trim() ?? '';
+    if (v.isEmpty) return 'Enter the code.';
+    if (!RegExp(r'^\d{6}$').hasMatch(v)) return 'Enter the 6-digit code.';
+    return null;
+  }
+
   static String? confirmPassword(String? value, String original) {
     if (value == null || value.isEmpty) return 'Please confirm your password.';
     if (value != original) return 'Passwords do not match.';

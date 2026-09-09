@@ -194,6 +194,26 @@ class OrSeparator extends StatelessWidget {
   }
 }
 
+/// Left-aligned back chevron for the secondary auth screens.
+class AuthBackButton extends StatelessWidget {
+  const AuthBackButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: GestureDetector(
+        onTap: () => Navigator.of(context).maybePop(),
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: EdgeInsets.all(8.r),
+          child: Icon(Icons.arrow_back, size: 20.r, color: AppColors.ink),
+        ),
+      ),
+    );
+  }
+}
+
 /// Footer row: muted prompt followed by a brand-coloured action link.
 class AuthFooterLink extends StatelessWidget {
   const AuthFooterLink({

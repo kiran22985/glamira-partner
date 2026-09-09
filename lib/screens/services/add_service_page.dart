@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../providers/auth_providers.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/auth_widgets.dart';
 import '../../widgets/dashed_border.dart';
 import '../../widgets/partner_text_field.dart';
 import '../../widgets/section_card.dart';
+import '../auth/partner_login_page.dart';
 
 /// A staff member who can perform the service.
 class _Specialist {
@@ -17,14 +20,14 @@ class _Specialist {
 }
 
 /// Add Service form — translated from the Figma "Add_service." frame (73:34).
-class AddServicePage extends StatefulWidget {
+class AddServicePage extends ConsumerStatefulWidget {
   const AddServicePage({super.key});
 
   @override
-  State<AddServicePage> createState() => _AddServicePageState();
+  ConsumerState<AddServicePage> createState() => _AddServicePageState();
 }
 
-class _AddServicePageState extends State<AddServicePage> {
+class _AddServicePageState extends ConsumerState<AddServicePage> {
   static const List<String> _categories = ['Skincare', 'Hair', 'Body', 'Nails'];
 
   static const List<_Specialist> _specialists = [
@@ -53,6 +56,20 @@ class _AddServicePageState extends State<AddServicePage> {
   void _snack(String message) {
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  /// Clears the stored token and returns to login.
+  ///
+  /// Temporary affordance so the auth flow can be exercised end to end — this
+  /// belongs on a profile screen once one exists.
+  Future<void> _logout() async {
+    await ref.read(partnerAuthRepositoryProvider).logout();
+    ref.read(authStateProvider.notifier).refresh();
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const PartnerLoginPage()),
+      (route) => false,
+    );
   }
 
   Future<void> _pickDuration() async {
@@ -159,21 +176,27 @@ class _AddServicePageState extends State<AddServicePage> {
             ),
           ),
           Expanded(
-            child: Padding(
-              // Offsets the back button so the title optically centres.
-              padding: EdgeInsets.only(right: 40.w),
-              child: Text(
-                'Add Service',
-                textAlign: TextAlign.center,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.bodoniModa(
-                  fontSize: 24.sp,
-                  height: 32 / 24,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.ink,
-                ),
+            child: Text(
+              'Add Service',
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: GoogleFonts.bodoniModa(
+                fontSize: 24.sp,
+                height: 32 / 24,
+                fontWeight: FontWeight.w500,
+                color: AppColors.ink,
               ),
+            ),
+          ),
+          // Temporary: not in the Figma frame, here so the auth flow can be
+          // tested end to end. Move to a profile screen when one exists.
+          GestureDetector(
+            onTap: _logout,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+              child: Icon(Icons.logout, size: 20.r, color: AppColors.link),
             ),
           ),
         ],

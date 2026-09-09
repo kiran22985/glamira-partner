@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../data/partner_auth_repository.dart';
+import '../../providers/auth_providers.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/validators.dart';
 import '../../widgets/auth_widgets.dart';
 import '../../widgets/partner_text_field.dart';
 import '../services/add_service_page.dart';
+import 'partner_forgot_password_page.dart';
 import 'partner_signup_page.dart';
 
 /// Partner Login screen — translated from the Figma "Partner Login" frame
 /// (node 54:2).
-class PartnerLoginPage extends StatefulWidget {
+class PartnerLoginPage extends ConsumerStatefulWidget {
   const PartnerLoginPage({super.key});
 
   @override
-  State<PartnerLoginPage> createState() => _PartnerLoginPageState();
+  ConsumerState<PartnerLoginPage> createState() => _PartnerLoginPageState();
 }
 
-class _PartnerLoginPageState extends State<PartnerLoginPage> {
+class _PartnerLoginPageState extends ConsumerState<PartnerLoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscure = true;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -31,19 +36,46 @@ class _PartnerLoginPageState extends State<PartnerLoginPage> {
     super.dispose();
   }
 
-  void _login() {
+  Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
     FocusScope.of(context).unfocus();
-    // TODO: authenticate against the partner API once it exists. For now this
-    // goes straight to Add Service so the screen can be reviewed.
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const AddServicePage()),
+    await _authenticate(
+      () => ref.read(partnerAuthRepositoryProvider).login(
+            email: _emailController.text,
+            password: _passwordController.text,
+          ),
     );
   }
 
-  void _notReady(String label) {
+  Future<void> _googleSignIn() async {
+    FocusScope.of(context).unfocus();
+    await _authenticate(
+      () => ref.read(partnerAuthRepositoryProvider).signInWithGoogle(),
+    );
+  }
+
+  /// Runs [request], then hands off to the signed-in area on success.
+  Future<void> _authenticate(Future<void> Function() request) async {
+    setState(() => _submitting = true);
+    try {
+      await request();
+      ref.read(authStateProvider.notifier).refresh();
+      if (!mounted) return;
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AddServicePage()),
+        (route) => false,
+      );
+    } on PartnerAuthException catch (e) {
+      _showError(e.message);
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
+  }
+
+  void _showError(String message) {
+    if (!mounted) return;
     ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('$label — not wired up yet')));
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -139,7 +171,11 @@ class _PartnerLoginPageState extends State<PartnerLoginPage> {
               borderRadius: 8,
               validator: (v) => Validators.requiredField(v, field: 'Password'),
               labelTrailing: GestureDetector(
-                onTap: () => _notReady('Forgot password'),
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const PartnerForgotPasswordPage(),
+                  ),
+                ),
                 child: Text(
                   'Forgot Password?',
                   style: GoogleFonts.inter(
@@ -167,11 +203,15 @@ class _PartnerLoginPageState extends State<PartnerLoginPage> {
             ),
             // 20 form gap + 8 button margin from the Figma frame.
             SizedBox(height: 28.h),
-            PartnerPrimaryButton(label: 'Login', onTap: _login),
+            PartnerPrimaryButton(
+              label: 'Login',
+              busy: _submitting,
+              onTap: _login,
+            ),
             SizedBox(height: 24.h),
             const OrSeparator(label: 'OR CONTINUE WITH'),
             SizedBox(height: 24.h),
-            GoogleButton(onTap: () => _notReady('Google sign-in')),
+            GoogleButton(busy: _submitting, onTap: _googleSignIn),
           ],
         ),
       ),

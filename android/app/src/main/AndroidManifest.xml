@@ -1,4 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Required in release builds too: the app calls the Glamira API and
+         google_fonts fetches its faces at runtime. Flutter's template only
+         declares this for debug/profile. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="Glamira Partner"
         android:name="${applicationName}"

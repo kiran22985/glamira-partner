@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../providers/auth_providers.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/auth_widgets.dart';
 import '../auth/partner_login_page.dart';
@@ -31,15 +33,16 @@ class _OnboardingPage {
 ///
 /// The slide order comes from the active progress dot in each frame, not from
 /// the node ids: Grow → Seamless → Insights (which carries "GET STARTED").
-class PartnerOnboardingScreen extends StatefulWidget {
+class PartnerOnboardingScreen extends ConsumerStatefulWidget {
   const PartnerOnboardingScreen({super.key});
 
   @override
-  State<PartnerOnboardingScreen> createState() =>
+  ConsumerState<PartnerOnboardingScreen> createState() =>
       _PartnerOnboardingScreenState();
 }
 
-class _PartnerOnboardingScreenState extends State<PartnerOnboardingScreen> {
+class _PartnerOnboardingScreenState
+    extends ConsumerState<PartnerOnboardingScreen> {
   /// Corner radius of the slide artwork.
   static const double _artworkRadius = 20;
 
@@ -76,8 +79,11 @@ class _PartnerOnboardingScreenState extends State<PartnerOnboardingScreen> {
     super.dispose();
   }
 
-  void _advance() {
+  Future<void> _advance() async {
     if (_isLast) {
+      // Remember it's been seen so the next launch goes straight to login.
+      await ref.read(onboardingSeenProvider.notifier).markSeen();
+      if (!mounted) return;
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const PartnerLoginPage()),
       );

@@ -1,24 +1,28 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../data/partner_auth_repository.dart';
+import '../../providers/auth_providers.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/validators.dart';
 import '../../widgets/auth_widgets.dart';
 import '../../widgets/partner_text_field.dart';
+import '../services/add_service_page.dart';
 
 /// Partner Sign Up screen — translated from the Figma
 /// "Partner Sign Up - Updated Flow" frame (node 54:50).
-class PartnerSignupPage extends StatefulWidget {
+class PartnerSignupPage extends ConsumerStatefulWidget {
   const PartnerSignupPage({super.key});
 
   @override
-  State<PartnerSignupPage> createState() => _PartnerSignupPageState();
+  ConsumerState<PartnerSignupPage> createState() => _PartnerSignupPageState();
 }
 
-class _PartnerSignupPageState extends State<PartnerSignupPage> {
+class _PartnerSignupPageState extends ConsumerState<PartnerSignupPage> {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _businessNameController = TextEditingController();
@@ -31,6 +35,7 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _agreedToTerms = false;
+  bool _submitting = false;
 
   @override
   void dispose() {
@@ -44,15 +49,36 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_agreedToTerms) {
       _snack('Please accept the Terms & Conditions to continue.');
       return;
     }
     FocusScope.of(context).unfocus();
-    // The partner API doesn't exist yet — see the backend's auth-only schema.
-    _snack('Partner sign-up — not wired up yet');
+
+    setState(() => _submitting = true);
+    try {
+      await ref.read(partnerAuthRepositoryProvider).signup(
+            fullName: _fullNameController.text,
+            businessName: _businessNameController.text,
+            email: _emailController.text,
+            phoneNumber: _phoneController.text,
+            address: _addressController.text,
+            password: _passwordController.text,
+          );
+      ref.read(authStateProvider.notifier).refresh();
+      if (!mounted) return;
+      // Signing up logs the partner straight in, so clear the auth stack.
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AddServicePage()),
+        (route) => false,
+      );
+    } on PartnerAuthException catch (e) {
+      _snack(e.message);
+    } finally {
+      if (mounted) setState(() => _submitting = false);
+    }
   }
 
   void _snack(String message) {
@@ -213,6 +239,7 @@ class _PartnerSignupPageState extends State<PartnerSignupPage> {
                 SizedBox(height: 36.h),
                 PartnerPrimaryButton(
                   label: 'CREATE PARTNER ACCOUNT',
+                  busy: _submitting,
                   onTap: _submit,
                   borderRadius: 12,
                   verticalPadding: 13,
