@@ -19,8 +19,9 @@ class Partner {
   final String address;
   final bool isActive;
 
-  /// Server-relative path to the parlor photo (e.g. `/media/parlors/x.jpg`),
-  /// or null. Prefix with [apiBaseUrl] to load it.
+  /// Absolute CDN URL of the parlor photo, or null when none was uploaded.
+  /// Images are stored on Cloudinary, so this loads directly — no base URL to
+  /// prepend.
   final String? imageUrl;
 
   factory Partner.fromJson(Map<String, dynamic> json) {
